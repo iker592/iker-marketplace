@@ -1,4 +1,18 @@
 {
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$ARGUMENTS\" | grep -q '\"command\":.*git commit' && [ \"$(git branch --show-current 2>/dev/null)\" = \"main\" -o \"$(git branch --show-current 2>/dev/null)\" = \"master\" ]; then echo 'Blocked: Cannot commit directly to main/master branch'; exit 1; fi",
+            "statusMessage": "Checking branch for commit"
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allow": [
       "Read",
@@ -20,7 +34,9 @@
       "Bash(gh issue view:*)",
       "Bash(git push:*)",
       "Bash(gh pr create:*)",
-      "Bash(gh pr edit:*)"
+      "Bash(gh pr edit:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [
       "Bash(git push origin main:*)",
