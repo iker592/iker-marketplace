@@ -38,10 +38,18 @@ def main() -> int:
         arguments_json = "{}"
 
 
+    # Debug: write to file
+    with open("/tmp/hook_debug.txt", "a") as f:
+        f.write(f"RAW: {arguments_json}\n---\n")
+
     try:
         arguments = json.loads(arguments_json)
     except json.JSONDecodeError:
         return 0  # Allow if we can't parse
+
+    # Debug
+    with open("/tmp/hook_debug.txt", "a") as f:
+        f.write(f"is_commit: {is_git_commit_command(arguments)}, branch: {get_current_branch()}\n---\n")
 
     if not is_git_commit_command(arguments):
         return 0  # Not a git commit, allow
