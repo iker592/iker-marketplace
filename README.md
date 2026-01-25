@@ -48,6 +48,7 @@ These commands run without permission prompts:
 | **Git (read)** | `git status`, `git log`, `git diff`, `git branch`, `git fetch`, `git show`, `git remote`, `git tag`, `git describe`, `git stash list`, `git rev-parse`, `git config` |
 | **Git (write)** | `git add`, `git commit`, `git push`, `git checkout`, `git switch` |
 | **GitHub CLI** | `gh pr list/view/create/edit/status/checks/diff`, `gh issue list/view/status`, `gh run list/view`, `gh release list/view`, `gh repo view` |
+| **AWS CLI** | `aws sts get-caller-identity`, `aws s3 ls`, `aws ec2/iam/lambda/logs/rds/dynamodb describe-*`, `aws iam/lambda list-*/get-*`, `aws ssm get-parameter` |
 | **Other** | `mkdir` |
 
 ---
