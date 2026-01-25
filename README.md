@@ -22,6 +22,38 @@ After installation, use the slash commands:
 - `/second-brain` - Knowledge management
 - `/daily-todos` - Task management
 
+## Managing Plugins
+
+```bash
+# Disable (stays installed, doesn't load)
+/plugin disable plugin-name
+
+# Enable again
+/plugin enable plugin-name
+
+# Uninstall completely
+/plugin uninstall plugin-name
+
+# List all plugins
+/plugin list
+```
+
+Or interactively:
+```bash
+/plugin
+# → Select "Manage and uninstall plugins"
+```
+
+**Manual method** (if CLI has issues):
+Edit `~/.claude/settings.json` and set the plugin to `false`:
+```json
+{
+  "enabledPlugins": {
+    "plugin-name@iker-marketplace": false
+  }
+}
+```
+
 ## Structure
 
 ```
