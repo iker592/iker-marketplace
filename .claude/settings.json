@@ -55,7 +55,6 @@
       "Bash(rm -rf:*)",
       "Bash(rmdir:*)",
       "Bash(mv:*)",
-      "Bash(chmod:*)",
       "Bash(chown:*)",
       "Bash(sudo:*)",
       "Bash(curl:*)",
