@@ -71,6 +71,33 @@ cmd_setup() {
         exit 1
     fi
 
+    # Show what will be installed
+    print_warning "This will apply settings GLOBALLY to all Claude Code projects."
+    echo
+    echo "What will be configured:"
+    echo "  • Block commits on main/master branches (hook)"
+    echo "  • Block pushes to main/master branches"
+    echo "  • Block PR merges via CLI"
+    echo "  • Block force pushes"
+    echo "  • Block destructive commands (rm, reset, etc.)"
+    echo "  • Auto-accept file edits"
+    echo "  • Status line with model & token usage"
+    echo
+    echo "Files that will be modified:"
+    echo "  • ~/.claude/settings.json (backed up first)"
+    echo "  • ~/.claude/hooks/block_commit_on_main.sh"
+    echo "  • ~/.claude/statusline.sh"
+    echo
+    read -p "Do you want to proceed? (y/N) " -n 1 -r
+    echo
+
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        print_info "Setup cancelled."
+        exit 0
+    fi
+
+    echo
+
     # Run the setup script from the installed location
     if [ -f "$IKER_HOME/scripts/setup-permissions.sh" ]; then
         bash "$IKER_HOME/scripts/setup-permissions.sh"
@@ -102,7 +129,21 @@ cmd_update() {
     echo
     print_info "Current version: $NEW_VERSION"
     echo
-    print_success "Done! Run 'iker setup' to configure Claude Code."
+
+    # Ask if they want to sync settings
+    read -p "Do you want to sync your Claude Code settings now? (Y/n) " -n 1 -r
+    echo
+
+    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+        echo
+        # Run setup without the confirmation (they already confirmed)
+        if [ -f "$IKER_HOME/scripts/setup-permissions.sh" ]; then
+            bash "$IKER_HOME/scripts/setup-permissions.sh"
+        fi
+    else
+        echo
+        print_info "Skipped. Run 'iker setup' later to sync settings."
+    fi
 }
 
 cmd_uninstall() {
