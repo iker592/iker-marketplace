@@ -15,8 +15,19 @@
 
 set -e
 
-VERSION="1.0.0"
 IKER_HOME="${IKER_HOME:-$HOME/.iker}"
+
+# Get version from git tags (falls back to "dev" if not in a git repo)
+get_version() {
+    if [ -d "$IKER_HOME/.git" ]; then
+        cd "$IKER_HOME"
+        git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "dev"
+    else
+        echo "dev"
+    fi
+}
+
+VERSION=$(get_version)
 REPO_URL="https://github.com/iker592/iker-marketplace"
 
 # Colors
@@ -117,6 +128,7 @@ cmd_update() {
     # Clone/pull latest
     if [ -d "$IKER_HOME" ]; then
         cd "$IKER_HOME"
+        git fetch --tags --quiet
         git pull --quiet origin main
         print_success "Updated to latest version"
     else
@@ -127,8 +139,8 @@ cmd_update() {
     # Ensure bin is executable
     chmod +x "$IKER_HOME/bin/iker"
 
-    # Show version
-    NEW_VERSION=$(grep '^VERSION=' "$IKER_HOME/bin/iker" | cut -d'"' -f2)
+    # Show version from git tags
+    NEW_VERSION=$(cd "$IKER_HOME" && git describe --tags --abbrev=0 2>/dev/null || echo "dev")
     echo
     print_info "Current version: $NEW_VERSION"
     echo
