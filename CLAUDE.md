@@ -1,40 +1,17 @@
 # CLAUDE.md
 
-Guidelines for autonomous software engineering in this repository.
+Quality software engineering in this repository.
 
 ## Core Principles
 
-1. **Be autonomous** - Make decisions and execute. Don't ask for permission on routine tasks.
-2. **Be thorough** - Complete the entire task, including tests, documentation updates, and edge cases.
-3. **Be safe** - Never push to main, never merge PRs, never run destructive commands.
-4. **Be iterative** - Ship small, working increments. One PR per feature/fix.
+1. **Be thorough** - Complete the entire task, including tests, documentation updates, and edge cases.
 
 ## Decision Framework
 
 ### Act Without Asking
 
-- Choosing implementation approach (pick the simplest that works)
-- Fixing bugs you discover along the way
-- Adding tests for code you write or modify
-- Refactoring for clarity if it helps your task
 - Creating branches and PRs
 - Updating documentation affected by your changes
-
-### Ask First
-
-- Deleting files or removing features
-- Changing public APIs or interfaces
-- Adding new dependencies
-- Architectural changes affecting multiple systems
-- Anything irreversible
-
-### Never Do
-
-- Push to main/master
-- Merge PRs
-- Force push
-- Run `rm -rf`, `git reset --hard`, or similar destructive commands
-- Commit secrets, credentials, or API keys
 
 ## Workflow
 
@@ -69,7 +46,6 @@ Guidelines for autonomous software engineering in this repository.
 
 ### Style
 
-- Follow existing patterns in the codebase
 - Use descriptive names over comments
 - Keep functions small and focused
 - Handle errors explicitly
@@ -78,26 +54,22 @@ Guidelines for autonomous software engineering in this repository.
 
 - Never hardcode secrets
 - Validate all external input
-- Use parameterized queries for databases
 - Escape output appropriately
 
 ## Language-Specific Guidance
 
 This repo may contain multiple languages. For language-specific practices:
 
-- **Python**: Check for `pyproject.toml`, `requirements.txt`, or `setup.py`. Run tests with `pytest`.
-- **TypeScript/JavaScript**: Check for `package.json`. Run tests with `npm test` or `yarn test`.
-- **Go**: Check for `go.mod`. Run tests with `go test ./...`.
-- **Rust**: Check for `Cargo.toml`. Run tests with `cargo test`.
+- **Python**: Check python-skill.
+- **TypeScript/JavaScript**: Check check typescript-skill.
 
-Look at existing code to understand the patterns used in this specific project.
 
 ## Project Structure Discovery
 
 Before making changes, understand the project:
 
 1. Check `README.md` for project overview
-2. Check `package.json`, `pyproject.toml`, `Cargo.toml`, etc. for dependencies and scripts
+2. Check dependencies and scripts
 3. Look at the directory structure to understand organization
 4. Find existing tests to understand testing patterns
 5. Check CI configuration (`.github/workflows/`) for build/test commands
