@@ -35,7 +35,9 @@
       "Bash(chown:*)",
       "Bash(sudo:*)",
       "Bash(curl:*)",
-      "Bash(wget:*)"
+      "Bash(wget:*)",
+      "Bash(gh pr merge:*)",
+      "Bash(gh pr merge)"
     ]
   }
 }
