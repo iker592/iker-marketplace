@@ -25,13 +25,18 @@ def get_current_branch() -> str | None:
 
 def is_git_commit_command(arguments: dict) -> bool:
     """Check if the command is a git commit."""
-    command = arguments.get("command", "")
+    tool_input = arguments.get("tool_input", {})
+    command = tool_input.get("command", "")
     return "git commit" in command
 
 
 def main() -> int:
-    # Get arguments from environment variable
-    arguments_json = os.environ.get("ARGUMENTS", "{}")
+    # Try to get arguments from stdin (Claude Code passes hook input via stdin)
+    try:
+        arguments_json = sys.stdin.read()
+    except Exception:
+        arguments_json = "{}"
+
 
     try:
         arguments = json.loads(arguments_json)
