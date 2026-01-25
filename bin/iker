@@ -213,8 +213,18 @@ cmd_merge() {
     fi
 
     print_info "Merging PR #$pr_number..."
-    gh pr merge "$pr_number" --merge
-    print_success "PR #$pr_number merged!"
+    if gh pr merge "$pr_number" --merge; then
+        print_success "PR #$pr_number merged!"
+
+        # Switch to main and pull latest
+        print_info "Updating local main branch..."
+        git checkout main --quiet
+        git pull --quiet
+        print_success "Now on main (up to date)"
+    else
+        print_error "Failed to merge PR #$pr_number"
+        exit 1
+    fi
 }
 
 # Main
