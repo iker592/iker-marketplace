@@ -16,6 +16,11 @@
       "name": "daily-todos",
       "source": "./plugins/daily-todos",
       "description": "Manage daily tasks and to-do lists"
+    },
+    {
+      "name": "python-dev",
+      "source": "./plugins/python-dev",
+      "description": "Python development standards: uv, FastAPI, FastMCP, pytest, ruff"
     }
   ]
 }
