@@ -84,6 +84,7 @@ HOOK_CONFIG='{
 # Extract permissions from repo settings
 REPO_ALLOW=$(jq '.permissions.allow // []' "$REPO_SETTINGS")
 REPO_DENY=$(jq '.permissions.deny // []' "$REPO_SETTINGS")
+REPO_DEFAULT_MODE=$(jq -r '.permissions.defaultMode // "acceptEdits"' "$REPO_SETTINGS")
 
 # Merge settings
 if [ -f "$GLOBAL_SETTINGS" ]; then
@@ -113,7 +114,8 @@ if [ -f "$GLOBAL_SETTINGS" ]; then
         --argjson hooks "$MERGED_HOOKS" \
         --argjson allow "$MERGED_ALLOW" \
         --argjson deny "$MERGED_DENY" \
-        '. + {hooks: $hooks, permissions: {allow: $allow, deny: $deny}}')
+        --arg defaultMode "$REPO_DEFAULT_MODE" \
+        '. + {hooks: $hooks, permissions: {defaultMode: $defaultMode, allow: $allow, deny: $deny}}')
 else
     echo "Creating new settings file..."
 
@@ -122,7 +124,8 @@ else
         --argjson hooks "$HOOK_CONFIG" \
         --argjson allow "$REPO_ALLOW" \
         --argjson deny "$REPO_DENY" \
-        '{hooks: $hooks, permissions: {allow: $allow, deny: $deny}}')
+        --arg defaultMode "$REPO_DEFAULT_MODE" \
+        '{hooks: $hooks, permissions: {defaultMode: $defaultMode, allow: $allow, deny: $deny}}')
 fi
 
 # Write final settings
@@ -147,6 +150,9 @@ echo "  • Cannot commit on main/master (hook)"
 echo "  • Cannot merge PRs via CLI"
 echo "  • Cannot force push"
 echo "  • Cannot run destructive commands (rm, reset, etc.)"
+echo
+echo -e "${GREEN}Convenience settings:${NC}"
+echo "  • Auto-accept file edits (no confirmation prompts)"
 echo
 echo -e "${YELLOW}⚠ Restart Claude Code for changes to take effect.${NC}"
 echo
