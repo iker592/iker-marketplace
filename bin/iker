@@ -20,8 +20,9 @@ IKER_HOME="${IKER_HOME:-$HOME/.iker}"
 # Get version from git tags (falls back to "dev" if not in a git repo)
 get_version() {
     if [ -d "$IKER_HOME/.git" ]; then
-        cd "$IKER_HOME"
-        git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "dev"
+        local version
+        version=$(cd "$IKER_HOME" && git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//')
+        echo "${version:-dev}"
     else
         echo "dev"
     fi
