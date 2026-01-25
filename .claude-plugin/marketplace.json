@@ -21,6 +21,16 @@
       "name": "python-dev",
       "source": "./plugins/python-dev",
       "description": "Python development standards: uv, FastAPI, FastMCP, pytest, ruff"
+    },
+    {
+      "name": "apple-notes",
+      "source": "./plugins/apple-notes",
+      "description": "Read, create, and manage Apple Notes on macOS via AppleScript"
+    },
+    {
+      "name": "claude-e-mart-testing",
+      "source": "./plugins/claude-e-mart-testing",
+      "description": "Test and run the Claude E-Mart chat application"
     }
   ]
 }

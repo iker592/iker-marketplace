@@ -1,0 +1,8 @@
+{
+  "name": "claude-e-mart-testing",
+  "version": "0.1.0",
+  "description": "Test and run the Claude E-Mart chat application",
+  "author": {
+    "name": "Iker"
+  }
+}
