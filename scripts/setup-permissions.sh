@@ -15,6 +15,7 @@ GLOBAL_SETTINGS="$CLAUDE_DIR/settings.json"
 GLOBAL_HOOKS_DIR="$CLAUDE_DIR/hooks"
 REPO_SETTINGS="$REPO_DIR/.claude/settings.json"
 REPO_HOOK="$REPO_DIR/.claude/hooks/block_commit_on_main.sh"
+REPO_STATUSLINE="$REPO_DIR/.claude/statusline.sh"
 
 # Colors for output
 RED='\033[0;31m'
@@ -62,6 +63,15 @@ if [ -f "$REPO_HOOK" ]; then
     chmod +x "$GLOBAL_HOOKS_DIR/block_commit_on_main.sh"
     echo -e "${GREEN}✓${NC} Installed hook script"
     echo "  $GLOBAL_HOOKS_DIR/block_commit_on_main.sh"
+    echo
+fi
+
+# Copy statusline script
+if [ -f "$REPO_STATUSLINE" ]; then
+    cp "$REPO_STATUSLINE" "$CLAUDE_DIR/statusline.sh"
+    chmod +x "$CLAUDE_DIR/statusline.sh"
+    echo -e "${GREEN}✓${NC} Installed statusline script"
+    echo "  $CLAUDE_DIR/statusline.sh"
     echo
 fi
 
@@ -115,7 +125,7 @@ if [ -f "$GLOBAL_SETTINGS" ]; then
         --argjson allow "$MERGED_ALLOW" \
         --argjson deny "$MERGED_DENY" \
         --arg defaultMode "$REPO_DEFAULT_MODE" \
-        '. + {hooks: $hooks, permissions: {defaultMode: $defaultMode, allow: $allow, deny: $deny}}')
+        '. + {hooks: $hooks, statusLine: {type: "command", command: "~/.claude/statusline.sh"}, permissions: {defaultMode: $defaultMode, allow: $allow, deny: $deny}}')
 else
     echo "Creating new settings file..."
 
@@ -125,7 +135,7 @@ else
         --argjson allow "$REPO_ALLOW" \
         --argjson deny "$REPO_DENY" \
         --arg defaultMode "$REPO_DEFAULT_MODE" \
-        '{hooks: $hooks, permissions: {defaultMode: $defaultMode, allow: $allow, deny: $deny}}')
+        '{hooks: $hooks, statusLine: {type: "command", command: "~/.claude/statusline.sh"}, permissions: {defaultMode: $defaultMode, allow: $allow, deny: $deny}}')
 fi
 
 # Write final settings
@@ -153,6 +163,7 @@ echo "  • Cannot run destructive commands (rm, reset, etc.)"
 echo
 echo -e "${GREEN}Convenience settings:${NC}"
 echo "  • Auto-accept file edits (no confirmation prompts)"
+echo "  • Status line showing model, context usage, and progress bar"
 echo
 echo -e "${YELLOW}⚠ Restart Claude Code for changes to take effect.${NC}"
 echo
