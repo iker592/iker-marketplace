@@ -1,0 +1,21 @@
+{
+  "name": "iker-marketplace",
+  "owner": {
+    "name": "Iker"
+  },
+  "metadata": {
+    "description": "Personal productivity plugins for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "second-brain",
+      "source": "./plugins/second-brain",
+      "description": "Capture, organize, and retrieve knowledge from your second brain"
+    },
+    {
+      "name": "daily-todos",
+      "source": "./plugins/daily-todos",
+      "description": "Manage daily tasks and to-do lists"
+    }
+  ]
+}
