@@ -8,6 +8,7 @@
 #   setup     Install Claude Code permissions and hooks globally
 #   update    Update iker to the latest version
 #   uninstall Remove iker from your system
+#   <number>  Merge PR by number (e.g., iker 14)
 #   version   Show version
 #   help      Show this help message
 #
@@ -50,12 +51,14 @@ show_help() {
     echo "  setup       Install Claude Code permissions and hooks globally"
     echo "  update      Update iker to the latest version"
     echo "  uninstall   Remove iker from your system"
+    echo "  <number>    Merge PR by number (shortcut for gh pr merge)"
     echo "  version     Show version"
     echo "  help        Show this help message"
     echo
     echo "Examples:"
     echo "  iker setup      # Configure Claude Code with safe defaults"
     echo "  iker update     # Get the latest version"
+    echo "  iker 14         # Merge PR #14"
     echo
 }
 
@@ -181,6 +184,21 @@ cmd_version() {
     echo "iker version $VERSION"
 }
 
+cmd_merge() {
+    local pr_number=$1
+
+    # Check for gh CLI
+    if ! command -v gh &> /dev/null; then
+        print_error "GitHub CLI (gh) is required but not installed."
+        echo "Install it with: brew install gh"
+        exit 1
+    fi
+
+    print_info "Merging PR #$pr_number..."
+    gh pr merge "$pr_number" --merge
+    print_success "PR #$pr_number merged!"
+}
+
 # Main
 case "${1:-help}" in
     setup)
@@ -199,9 +217,14 @@ case "${1:-help}" in
         show_help
         ;;
     *)
-        print_error "Unknown command: $1"
-        echo
-        show_help
-        exit 1
+        # Check if it's a number (PR merge shortcut)
+        if [[ "$1" =~ ^[0-9]+$ ]]; then
+            cmd_merge "$1"
+        else
+            print_error "Unknown command: $1"
+            echo
+            show_help
+            exit 1
+        fi
         ;;
 esac
