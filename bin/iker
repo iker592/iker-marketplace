@@ -1,0 +1,166 @@
+#!/bin/bash
+#
+# iker - Claude Code setup and configuration CLI
+#
+# Usage: iker <command>
+#
+# Commands:
+#   setup     Install Claude Code permissions and hooks globally
+#   update    Update iker to the latest version
+#   uninstall Remove iker from your system
+#   version   Show version
+#   help      Show this help message
+#
+
+set -e
+
+VERSION="1.0.0"
+IKER_HOME="${IKER_HOME:-$HOME/.iker}"
+REPO_URL="https://github.com/iker592/iker-marketplace"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+print_success() { echo -e "${GREEN}✓${NC} $1"; }
+print_warning() { echo -e "${YELLOW}⚠${NC} $1"; }
+print_error() { echo -e "${RED}✗${NC} $1"; }
+print_info() { echo -e "${BLUE}→${NC} $1"; }
+
+show_banner() {
+    echo -e "${BLUE}"
+    echo "  _ _             "
+    echo " (_) | _____ _ __ "
+    echo " | | |/ / _ \\ '__|"
+    echo " | |   <  __/ |   "
+    echo " |_|_|\\_\\___|_|   "
+    echo -e "${NC}"
+    echo "  Claude Code Configuration CLI v${VERSION}"
+    echo
+}
+
+show_help() {
+    show_banner
+    echo "Usage: iker <command>"
+    echo
+    echo "Commands:"
+    echo "  setup       Install Claude Code permissions and hooks globally"
+    echo "  update      Update iker to the latest version"
+    echo "  uninstall   Remove iker from your system"
+    echo "  version     Show version"
+    echo "  help        Show this help message"
+    echo
+    echo "Examples:"
+    echo "  iker setup      # Configure Claude Code with safe defaults"
+    echo "  iker update     # Get the latest version"
+    echo
+}
+
+cmd_setup() {
+    show_banner
+
+    # Check for jq
+    if ! command -v jq &> /dev/null; then
+        print_error "jq is required but not installed."
+        echo "Install it with:"
+        echo "  macOS:  brew install jq"
+        echo "  Ubuntu: sudo apt-get install jq"
+        exit 1
+    fi
+
+    # Run the setup script from the installed location
+    if [ -f "$IKER_HOME/scripts/setup-permissions.sh" ]; then
+        bash "$IKER_HOME/scripts/setup-permissions.sh"
+    else
+        print_error "Setup script not found. Try running: iker update"
+        exit 1
+    fi
+}
+
+cmd_update() {
+    show_banner
+    print_info "Updating iker..."
+
+    # Clone/pull latest
+    if [ -d "$IKER_HOME" ]; then
+        cd "$IKER_HOME"
+        git pull --quiet origin main
+        print_success "Updated to latest version"
+    else
+        git clone --quiet "$REPO_URL.git" "$IKER_HOME"
+        print_success "Installed iker"
+    fi
+
+    # Ensure bin is executable
+    chmod +x "$IKER_HOME/bin/iker"
+
+    # Show version
+    NEW_VERSION=$(grep '^VERSION=' "$IKER_HOME/bin/iker" | cut -d'"' -f2)
+    echo
+    print_info "Current version: $NEW_VERSION"
+    echo
+    print_success "Done! Run 'iker setup' to configure Claude Code."
+}
+
+cmd_uninstall() {
+    show_banner
+    print_warning "This will remove iker from your system."
+    echo
+    read -p "Are you sure? (y/N) " -n 1 -r
+    echo
+
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        # Remove iker home directory
+        if [ -d "$IKER_HOME" ]; then
+            rm -rf "$IKER_HOME"
+            print_success "Removed $IKER_HOME"
+        fi
+
+        # Remove symlink
+        if [ -L "/usr/local/bin/iker" ]; then
+            rm -f "/usr/local/bin/iker"
+            print_success "Removed /usr/local/bin/iker"
+        elif [ -L "$HOME/.local/bin/iker" ]; then
+            rm -f "$HOME/.local/bin/iker"
+            print_success "Removed $HOME/.local/bin/iker"
+        fi
+
+        echo
+        print_success "iker has been uninstalled."
+        print_info "Note: Your Claude Code settings were not removed."
+    else
+        print_info "Uninstall cancelled."
+    fi
+}
+
+cmd_version() {
+    echo "iker version $VERSION"
+}
+
+# Main
+case "${1:-help}" in
+    setup)
+        cmd_setup
+        ;;
+    update)
+        cmd_update
+        ;;
+    uninstall)
+        cmd_uninstall
+        ;;
+    version|--version|-v)
+        cmd_version
+        ;;
+    help|--help|-h|"")
+        show_help
+        ;;
+    *)
+        print_error "Unknown command: $1"
+        echo
+        show_help
+        exit 1
+        ;;
+esac
