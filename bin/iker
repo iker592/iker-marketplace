@@ -124,26 +124,31 @@ cmd_setup() {
 
 cmd_update() {
     show_banner
-    print_info "Updating iker..."
 
     # Clone/pull latest
     if [ -d "$IKER_HOME" ]; then
+        # Get current version before update
+        OLD_VERSION=$(cd "$IKER_HOME" && git describe --tags --abbrev=0 2>/dev/null || echo "dev")
+        print_info "Updating from $OLD_VERSION..."
+
         cd "$IKER_HOME"
         git fetch --tags --quiet
         git pull --quiet origin main
-        print_success "Updated to latest version"
+
+        # Get new version after update
+        NEW_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev")
+        print_success "Updated to $NEW_VERSION"
     else
+        print_info "Installing iker..."
         git clone --quiet "$REPO_URL.git" "$IKER_HOME"
-        print_success "Installed iker"
+        cd "$IKER_HOME"
+        git fetch --tags --quiet
+        NEW_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev")
+        print_success "Installed $NEW_VERSION"
     fi
 
     # Ensure bin is executable
     chmod +x "$IKER_HOME/bin/iker"
-
-    # Show version from git tags
-    NEW_VERSION=$(cd "$IKER_HOME" && git describe --tags --abbrev=0 2>/dev/null || echo "dev")
-    echo
-    print_info "Current version: $NEW_VERSION"
     echo
 
     # Ask if they want to sync settings
