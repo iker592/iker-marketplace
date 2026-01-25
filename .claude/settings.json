@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run .claude/hooks/block_commit_on_main.py",
+            "command": ".claude/hooks/block_commit_on_main.sh",
             "statusMessage": "Checking branch for commit"
           }
         ]
