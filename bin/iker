@@ -129,7 +129,21 @@ cmd_update() {
     echo
     print_info "Current version: $NEW_VERSION"
     echo
-    print_success "Done! Run 'iker setup' to configure Claude Code."
+
+    # Ask if they want to sync settings
+    read -p "Do you want to sync your Claude Code settings now? (Y/n) " -n 1 -r
+    echo
+
+    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+        echo
+        # Run setup without the confirmation (they already confirmed)
+        if [ -f "$IKER_HOME/scripts/setup-permissions.sh" ]; then
+            bash "$IKER_HOME/scripts/setup-permissions.sh"
+        fi
+    else
+        echo
+        print_info "Skipped. Run 'iker setup' later to sync settings."
+    fi
 }
 
 cmd_uninstall() {
