@@ -17,11 +17,18 @@
       "Bash(gh pr list:*)",
       "Bash(gh pr view:*)",
       "Bash(gh issue list:*)",
-      "Bash(gh issue view:*)"
+      "Bash(gh issue view:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)"
     ],
     "deny": [
-      "Bash(git push:*)",
-      "Bash(git push)",
+      "Bash(git push origin main:*)",
+      "Bash(git push origin main)",
+      "Bash(git push upstream main:*)",
+      "Bash(git push upstream main)",
+      "Bash(git push * main)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
       "Bash(git reset:*)",
       "Bash(git checkout .)",
       "Bash(git restore:*)",
