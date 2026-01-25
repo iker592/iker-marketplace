@@ -1,4 +1,18 @@
 {
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run .claude/hooks/block_commit_on_main.py",
+            "statusMessage": "Checking branch for commit"
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allow": [
       "Read",
@@ -17,11 +31,21 @@
       "Bash(gh pr list:*)",
       "Bash(gh pr view:*)",
       "Bash(gh issue list:*)",
-      "Bash(gh issue view:*)"
+      "Bash(gh issue view:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr edit:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [
-      "Bash(git push:*)",
-      "Bash(git push)",
+      "Bash(git push origin main:*)",
+      "Bash(git push origin main)",
+      "Bash(git push upstream main:*)",
+      "Bash(git push upstream main)",
+      "Bash(git push * main)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
       "Bash(git reset:*)",
       "Bash(git checkout .)",
       "Bash(git restore:*)",
@@ -31,7 +55,6 @@
       "Bash(rm -rf:*)",
       "Bash(rmdir:*)",
       "Bash(mv:*)",
-      "Bash(chmod:*)",
       "Bash(chown:*)",
       "Bash(sudo:*)",
       "Bash(curl:*)",
