@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# Iker Marketplace - Cross-Platform Setup Script
-# Installs skills for Claude Code and Cursor IDE
+# Iker Marketplace - Claude Code Setup Script
+# Installs skills for Claude Code
 #
 
 set -e
@@ -38,24 +38,14 @@ print_info() {
     echo -e "${BLUE}→${NC} $1"
 }
 
-# Detect target directory (project or global)
+# Detect target directory
 detect_target() {
-    local tool=$1
-    local scope=$2
+    local scope=$1
 
     if [[ "$scope" == "global" ]]; then
-        if [[ "$tool" == "claude" ]]; then
-            echo "$HOME/.claude/skills"
-        else
-            echo "$HOME/.cursor/skills"
-        fi
+        echo "$HOME/.claude/skills"
     else
-        # Project-level (current directory)
-        if [[ "$tool" == "claude" ]]; then
-            echo ".claude/skills"
-        else
-            echo ".cursor/skills"
-        fi
+        echo ".claude/skills"
     fi
 }
 
@@ -81,12 +71,12 @@ copy_plugin_skills() {
     done
 }
 
-# Install for Claude Code
-install_claude() {
+# Install skills
+install_skills() {
     local scope=${1:-"project"}
-    local target_dir=$(detect_target "claude" "$scope")
+    local target_dir=$(detect_target "$scope")
 
-    print_info "Installing for Claude Code ($scope)..."
+    print_info "Installing skills ($scope)..."
     mkdir -p "$target_dir"
 
     for plugin_dir in "$MARKETPLACE_ROOT/plugins"/*/; do
@@ -96,34 +86,7 @@ install_claude() {
         fi
     done
 
-    print_success "Claude Code installation complete: $target_dir"
-}
-
-# Install for Cursor
-install_cursor() {
-    local scope=${1:-"project"}
-    local target_dir=$(detect_target "cursor" "$scope")
-
-    print_info "Installing for Cursor IDE ($scope)..."
-    print_warning "Note: Cursor symlinks have known issues. Using copy method."
-    mkdir -p "$target_dir"
-
-    for plugin_dir in "$MARKETPLACE_ROOT/plugins"/*/; do
-        if [[ -d "$plugin_dir" ]]; then
-            plugin_name=$(basename "$plugin_dir")
-            copy_plugin_skills "$plugin_name" "$target_dir"
-        fi
-    done
-
-    print_success "Cursor installation complete: $target_dir"
-}
-
-# Install for both tools
-install_both() {
-    local scope=${1:-"project"}
-    install_claude "$scope"
-    echo ""
-    install_cursor "$scope"
+    print_success "Installation complete: $target_dir"
 }
 
 # List available plugins
@@ -132,7 +95,6 @@ list_plugins() {
     for plugin_dir in "$MARKETPLACE_ROOT/plugins"/*/; do
         if [[ -d "$plugin_dir" ]]; then
             plugin_name=$(basename "$plugin_dir")
-            # Read description from plugin.json if available
             plugin_json="$plugin_dir/.claude-plugin/plugin.json"
             if [[ -f "$plugin_json" ]]; then
                 desc=$(grep -o '"description"[[:space:]]*:[[:space:]]*"[^"]*"' "$plugin_json" | sed 's/"description"[[:space:]]*:[[:space:]]*"\([^"]*\)"/\1/')
@@ -146,9 +108,8 @@ list_plugins() {
 
 # Uninstall skills
 uninstall() {
-    local tool=$1
-    local scope=${2:-"project"}
-    local target_dir=$(detect_target "$tool" "$scope")
+    local scope=${1:-"project"}
+    local target_dir=$(detect_target "$scope")
 
     if [[ -d "$target_dir" ]]; then
         print_info "Removing skills from: $target_dir"
@@ -173,49 +134,43 @@ uninstall() {
 
 # Show help
 show_help() {
-    echo "Usage: $0 [command] [options]"
+    echo "Usage: $0 [command] [scope]"
     echo ""
     echo "Commands:"
-    echo "  claude [scope]    Install skills for Claude Code"
-    echo "  cursor [scope]    Install skills for Cursor IDE"
-    echo "  both [scope]      Install for both tools (default)"
+    echo "  install [scope]   Install skills (default command)"
     echo "  list              List available plugins"
-    echo "  uninstall <tool> [scope]  Remove installed skills"
+    echo "  uninstall [scope] Remove installed skills"
     echo "  help              Show this help message"
     echo ""
     echo "Scope options:"
     echo "  project           Install to current directory (default)"
-    echo "  global            Install to user home directory"
+    echo "  global            Install to ~/.claude/skills/"
     echo ""
     echo "Examples:"
-    echo "  $0                        # Install both, project scope"
-    echo "  $0 claude global          # Install Claude Code globally"
-    echo "  $0 cursor project         # Install Cursor in project"
-    echo "  $0 uninstall cursor       # Remove Cursor skills"
+    echo "  $0                # Install to project"
+    echo "  $0 global         # Install globally"
+    echo "  $0 install global # Same as above"
+    echo "  $0 uninstall      # Remove from project"
+    echo "  $0 list           # List available plugins"
 }
 
 # Main
 print_header
 
-case "${1:-both}" in
-    claude)
-        install_claude "${2:-project}"
-        ;;
-    cursor)
-        install_cursor "${2:-project}"
-        ;;
-    both)
-        install_both "${2:-project}"
+case "${1:-install}" in
+    install|project|global)
+        # Handle both "./setup.sh global" and "./setup.sh install global"
+        if [[ "$1" == "project" || "$1" == "global" ]]; then
+            install_skills "$1"
+        else
+            install_skills "${2:-project}"
+        fi
         ;;
     list)
         list_plugins
         ;;
     uninstall)
-        if [[ -z "$2" ]]; then
-            print_error "Please specify tool: claude or cursor"
-            exit 1
-        fi
-        uninstall "$2" "${3:-project}"
+        uninstall "${2:-project}"
         ;;
     help|--help|-h)
         show_help
@@ -228,4 +183,4 @@ case "${1:-both}" in
 esac
 
 echo ""
-print_info "Done! Restart your IDE to load the new skills."
+print_info "Done! Restart Claude Code to load the skills."
