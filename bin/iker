@@ -44,6 +44,21 @@ print_warning() { echo -e "${YELLOW}⚠${NC} $1"; }
 print_error() { echo -e "${RED}✗${NC} $1"; }
 print_info() { echo -e "${BLUE}→${NC} $1"; }
 
+# Pull latest iker version silently
+pull_latest() {
+    if [ -d "$IKER_HOME/.git" ]; then
+        local OLD_VERSION=$(cd "$IKER_HOME" && git describe --tags --abbrev=0 2>/dev/null || echo "unknown")
+        cd "$IKER_HOME"
+        git fetch --tags --quiet 2>/dev/null || true
+        git pull --quiet origin main 2>/dev/null || true
+        local NEW_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "unknown")
+        if [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
+            print_success "Updated iker: $OLD_VERSION → $NEW_VERSION"
+        fi
+        cd - > /dev/null
+    fi
+}
+
 show_banner() {
     echo -e "${BLUE}"
     echo "  _ _             "
@@ -79,6 +94,9 @@ show_help() {
 
 cmd_setup_local() {
     show_banner
+
+    # Pull latest version first
+    pull_latest
 
     # Check for jq
     if ! command -v jq &> /dev/null; then
@@ -127,6 +145,9 @@ cmd_setup_local() {
 
 cmd_setup_global() {
     show_banner
+
+    # Pull latest version first
+    pull_latest
 
     # Check for jq
     if ! command -v jq &> /dev/null; then
