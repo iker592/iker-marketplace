@@ -1,0 +1,8 @@
+{
+  "name": "typescript-dev",
+  "version": "0.1.0",
+  "description": "TypeScript/React development standards: Bun, Vite, React, Tailwind, shadcn/ui, Zustand, Vitest, Playwright, Biome",
+  "author": {
+    "name": "Iker"
+  }
+}
