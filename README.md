@@ -6,7 +6,9 @@ Claude Code configuration CLI and productivity plugins.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/iker592/iker-marketplace/main/install.sh | bash
-iker setup
+iker setup     # Setup for current project (local, gitignored)
+# OR
+iker global    # Setup globally for all projects
 ```
 
 Then restart Claude Code.
@@ -57,11 +59,16 @@ These commands run without permission prompts:
 
 | Command | Description |
 |---------|-------------|
-| `iker setup` | Configure Claude Code permissions & hooks |
+| `iker setup` | Setup permissions for current project (`.claude/settings.local.json`) |
+| `iker global` | Setup permissions globally for all projects (`~/.claude/settings.json`) |
 | `iker update` | Update iker to latest version |
 | `iker <number>` | Merge PR by number (e.g., `iker 14`) |
 | `iker uninstall` | Remove iker from your system |
 | `iker help` | Show help |
+
+**Which should I use?**
+- `iker setup` - Per-project settings that are gitignored (personal preferences)
+- `iker global` - Global settings that apply to all projects + hooks + statusline
 
 ---
 
@@ -71,9 +78,10 @@ These commands run without permission prompts:
 |------|---------|
 | `~/.iker/` | iker installation directory |
 | `~/.local/bin/iker` | CLI symlink |
-| `~/.claude/hooks/block_commit_on_main.sh` | Blocks commits on main |
-| `~/.claude/statusline.sh` | Status line script |
-| `~/.claude/settings.json` | Merged permissions & config |
+| `~/.claude/hooks/block_commit_on_main.sh` | Blocks commits on main (global) |
+| `~/.claude/statusline.sh` | Status line script (global) |
+| `~/.claude/settings.json` | Global permissions & config |
+| `.claude/settings.local.json` | Per-project permissions (gitignored) |
 
 ---
 
@@ -82,8 +90,8 @@ These commands run without permission prompts:
 When new features are added:
 
 ```bash
-iker update    # Pull latest changes
-iker setup     # Re-run setup to apply updates
+iker update    # Pull latest changes (offers to sync global settings)
+iker setup     # Re-run to update current project settings
 ```
 
 ---
@@ -125,7 +133,7 @@ After installation, use the slash commands:
 
 ## Requirements
 
-- **jq** - Required for `iker setup` (`brew install jq` on macOS)
+- **jq** - Required for `iker setup` and `iker global` (`brew install jq` on macOS)
 - **git** - Required for installation
 
 ---
@@ -160,7 +168,8 @@ iker-marketplace/
 ├── install.sh                  # Curl installer
 ├── scripts/
 │   ├── setup.sh                # Skills installer
-│   └── setup-permissions.sh    # Permissions setup
+│   ├── setup-permissions.sh    # Global permissions setup
+│   └── setup-local.sh          # Local project setup
 ├── .claude/
 │   ├── settings.json           # Default permissions
 │   ├── statusline.sh           # Status line script
