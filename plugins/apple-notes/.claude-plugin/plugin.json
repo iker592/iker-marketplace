@@ -1,0 +1,8 @@
+{
+  "name": "apple-notes",
+  "version": "0.1.0",
+  "description": "Read, create, and manage Apple Notes on macOS via AppleScript",
+  "author": {
+    "name": "Iker"
+  }
+}
