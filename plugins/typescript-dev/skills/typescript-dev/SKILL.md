@@ -737,14 +737,14 @@ bunx @biomejs/biome check --write .  # Direct command
 All projects must have a Makefile with these targets:
 
 ```makefile
-.PHONY: setup dev build test test-ui e2e fix lint preview clean all
+.PHONY: setup ui build test test-ui e2e fix lint preview clean all
 
 setup:
 	curl -fsSL https://bun.sh/install | bash
 	bun install
 	bunx --bun playwright install
 
-dev:
+ui:
 	bun run dev
 
 build:
@@ -779,7 +779,7 @@ all: fix test build
 | Target | When to Use |
 |--------|-------------|
 | `make setup` | First time cloning the repo |
-| `make dev` | Start development server |
+| `make ui` | Start development server |
 | `make build` | Build for production |
 | `make test` | Run unit tests |
 | `make test-ui` | Run tests with Vitest UI |

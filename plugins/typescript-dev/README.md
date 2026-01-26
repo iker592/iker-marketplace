@@ -36,7 +36,7 @@ The skill is automatically loaded when working with TypeScript/React code. It pr
 
 ```bash
 make setup    # First time setup
-make dev      # Start dev server
+make ui       # Start dev server
 make test     # Run unit tests
 make e2e      # Run E2E tests
 make fix      # Fix linting/formatting
