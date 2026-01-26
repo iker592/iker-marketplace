@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Setup Claude Code local project permissions
+# Setup Claude Code local project settings
 # Creates .claude/settings.local.json in the current project directory.
 # This file is gitignored and applies only to this project for you.
 #
@@ -14,7 +14,10 @@ IKER_DIR="$(dirname "$SCRIPT_DIR")"
 PROJECT_DIR="$(pwd)"
 CLAUDE_DIR="$PROJECT_DIR/.claude"
 LOCAL_SETTINGS="$CLAUDE_DIR/settings.local.json"
+LOCAL_HOOKS_DIR="$CLAUDE_DIR/hooks"
 IKER_SETTINGS="$IKER_DIR/.claude/settings.json"
+IKER_HOOK="$IKER_DIR/.claude/hooks/block_commit_on_main.sh"
+IKER_STATUSLINE="$IKER_DIR/.claude/statusline.sh"
 
 # Colors for output
 RED='\033[0;31m'
@@ -45,23 +48,57 @@ if [ ! -f "$IKER_SETTINGS" ]; then
     exit 1
 fi
 
-# Create .claude directory if it doesn't exist
+# Create directories
 mkdir -p "$CLAUDE_DIR"
+mkdir -p "$LOCAL_HOOKS_DIR"
 
-# Add settings.local.json to .gitignore if not already there
+# Add local files to .gitignore if not already there
 GITIGNORE="$PROJECT_DIR/.gitignore"
+GITIGNORE_ENTRIES=(
+    ".claude/settings.local.json"
+    ".claude/hooks/"
+    ".claude/statusline.sh"
+)
+
 if [ -f "$GITIGNORE" ]; then
-    if ! grep -q "^\.claude/settings\.local\.json$" "$GITIGNORE" 2>/dev/null; then
-        echo "" >> "$GITIGNORE"
-        echo "# Claude Code local settings (personal, not shared)" >> "$GITIGNORE"
-        echo ".claude/settings.local.json" >> "$GITIGNORE"
-        echo -e "${GREEN}✓${NC} Added settings.local.json to .gitignore"
+    NEEDS_HEADER=true
+    for entry in "${GITIGNORE_ENTRIES[@]}"; do
+        if ! grep -qF "$entry" "$GITIGNORE" 2>/dev/null; then
+            if $NEEDS_HEADER; then
+                echo "" >> "$GITIGNORE"
+                echo "# Claude Code local settings (personal, not shared)" >> "$GITIGNORE"
+                NEEDS_HEADER=false
+            fi
+            echo "$entry" >> "$GITIGNORE"
+        fi
+    done
+    if ! $NEEDS_HEADER; then
+        echo -e "${GREEN}✓${NC} Updated .gitignore with local Claude Code files"
     fi
 else
     echo "# Claude Code local settings (personal, not shared)" > "$GITIGNORE"
-    echo ".claude/settings.local.json" >> "$GITIGNORE"
-    echo -e "${GREEN}✓${NC} Created .gitignore with settings.local.json"
+    for entry in "${GITIGNORE_ENTRIES[@]}"; do
+        echo "$entry" >> "$GITIGNORE"
+    done
+    echo -e "${GREEN}✓${NC} Created .gitignore with local Claude Code files"
 fi
+
+# Copy hook script
+if [ -f "$IKER_HOOK" ]; then
+    cp "$IKER_HOOK" "$LOCAL_HOOKS_DIR/"
+    chmod +x "$LOCAL_HOOKS_DIR/block_commit_on_main.sh"
+    echo -e "${GREEN}✓${NC} Installed hook script"
+    echo "  $LOCAL_HOOKS_DIR/block_commit_on_main.sh"
+fi
+
+# Copy statusline script
+if [ -f "$IKER_STATUSLINE" ]; then
+    cp "$IKER_STATUSLINE" "$CLAUDE_DIR/statusline.sh"
+    chmod +x "$CLAUDE_DIR/statusline.sh"
+    echo -e "${GREEN}✓${NC} Installed statusline script"
+    echo "  $CLAUDE_DIR/statusline.sh"
+fi
+echo
 
 # Backup existing local settings if they exist
 if [ -f "$LOCAL_SETTINGS" ]; then
@@ -100,26 +137,30 @@ if [ -f "$LOCAL_SETTINGS" ]; then
     EXISTING=$(cat "$LOCAL_SETTINGS")
     EXISTING_ALLOW=$(echo "$EXISTING" | jq '.permissions.allow // []')
     EXISTING_DENY=$(echo "$EXISTING" | jq '.permissions.deny // []')
+    EXISTING_HOOKS=$(echo "$EXISTING" | jq '.hooks // {}')
 
     # Merge arrays (unique values)
     MERGED_ALLOW=$(jq -n --argjson a "$EXISTING_ALLOW" --argjson b "$IKER_ALLOW" '$a + $b | unique')
     MERGED_DENY=$(jq -n --argjson a "$EXISTING_DENY" --argjson b "$IKER_DENY" '$a + $b | unique')
+    MERGED_HOOKS=$(jq -n --argjson existing "$EXISTING_HOOKS" --argjson new "$HOOK_CONFIG" '$existing * $new')
 
     # Build final settings
     FINAL=$(echo "$EXISTING" | jq \
+        --argjson hooks "$MERGED_HOOKS" \
         --argjson allow "$MERGED_ALLOW" \
         --argjson deny "$MERGED_DENY" \
         --arg defaultMode "$IKER_DEFAULT_MODE" \
-        '. + {permissions: {defaultMode: $defaultMode, allow: $allow, deny: $deny}}')
+        '. + {hooks: $hooks, statusLine: {type: "command", command: ".claude/statusline.sh"}, permissions: {defaultMode: $defaultMode, allow: $allow, deny: $deny}}')
 else
     echo "Creating new local settings file..."
 
-    # Create new settings (no hooks in local - they come from shared settings.json)
+    # Create new settings with hooks and permissions
     FINAL=$(jq -n \
+        --argjson hooks "$HOOK_CONFIG" \
         --argjson allow "$IKER_ALLOW" \
         --argjson deny "$IKER_DENY" \
         --arg defaultMode "$IKER_DEFAULT_MODE" \
-        '{permissions: {defaultMode: $defaultMode, allow: $allow, deny: $deny}}')
+        '{hooks: $hooks, statusLine: {type: "command", command: ".claude/statusline.sh"}, permissions: {defaultMode: $defaultMode, allow: $allow, deny: $deny}}')
 fi
 
 # Write final settings
@@ -139,6 +180,7 @@ echo "  Allow list: $(echo "$FINAL" | jq '.permissions.allow | length') rules"
 echo "  Deny list:  $(echo "$FINAL" | jq '.permissions.deny | length') rules"
 echo
 echo -e "${GREEN}Key protections enabled:${NC}"
+echo "  • Cannot commit on main/master branches (hook)"
 echo "  • Cannot push to main/master branches"
 echo "  • Cannot merge PRs via CLI"
 echo "  • Cannot force push"
@@ -146,8 +188,9 @@ echo "  • Cannot run destructive commands (rm, reset, etc.)"
 echo
 echo -e "${GREEN}Convenience settings:${NC}"
 echo "  • Auto-accept file edits (no confirmation prompts)"
+echo "  • Status line showing model, context usage, and progress bar"
 echo
-echo -e "${YELLOW}Note:${NC} This file is gitignored and only applies to YOU in this project."
+echo -e "${YELLOW}Note:${NC} These files are gitignored and only apply to YOU in this project."
 echo -e "      For shared team settings, edit ${BLUE}.claude/settings.json${NC}"
 echo
 echo -e "${YELLOW}⚠ Restart Claude Code for changes to take effect.${NC}"

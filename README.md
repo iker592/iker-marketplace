@@ -6,9 +6,9 @@ Claude Code configuration CLI and productivity plugins.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/iker592/iker-marketplace/main/install.sh | bash
-iker setup     # Setup for current project (local, gitignored)
+iker setup-local    # Setup for current project (gitignored)
 # OR
-iker global    # Setup globally for all projects
+iker setup-global   # Setup globally for all projects
 ```
 
 Then restart Claude Code.
@@ -59,16 +59,16 @@ These commands run without permission prompts:
 
 | Command | Description |
 |---------|-------------|
-| `iker setup` | Setup permissions for current project (`.claude/settings.local.json`) |
-| `iker global` | Setup permissions globally for all projects (`~/.claude/settings.json`) |
+| `iker setup-local` | Setup for current project (`.claude/settings.local.json`, gitignored) |
+| `iker setup-global` | Setup globally for all projects (`~/.claude/settings.json`) |
 | `iker update` | Update iker to latest version |
 | `iker <number>` | Merge PR by number (e.g., `iker 14`) |
 | `iker uninstall` | Remove iker from your system |
 | `iker help` | Show help |
 
 **Which should I use?**
-- `iker setup` - Per-project settings that are gitignored (personal preferences)
-- `iker global` - Global settings that apply to all projects + hooks + statusline
+- `iker setup-local` - Per-project settings (gitignored, includes hooks + statusline)
+- `iker setup-global` - Global settings that apply to all projects
 
 ---
 
@@ -90,8 +90,8 @@ These commands run without permission prompts:
 When new features are added:
 
 ```bash
-iker update    # Pull latest changes (offers to sync global settings)
-iker setup     # Re-run to update current project settings
+iker update         # Pull latest changes (offers to sync global settings)
+iker setup-local    # Re-run to update current project settings
 ```
 
 ---
@@ -133,7 +133,7 @@ After installation, use the slash commands:
 
 ## Requirements
 
-- **jq** - Required for `iker setup` and `iker global` (`brew install jq` on macOS)
+- **jq** - Required for setup commands (`brew install jq` on macOS)
 - **git** - Required for installation
 
 ---
