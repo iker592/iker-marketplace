@@ -8,6 +8,11 @@
             "type": "command",
             "command": ".claude/hooks/block_commit_on_main.sh",
             "statusMessage": "Checking branch for commit"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/suggest_makefile.sh",
+            "statusMessage": "Checking for Makefile targets"
           }
         ]
       }
@@ -138,7 +143,10 @@
       "Bash(git commit:*)",
       "Bash(git checkout:*)",
       "Bash(git switch:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+
+      "Bash(make:*)",
+      "Bash(make)"
     ],
     "deny": [
       "Bash(git push origin main:*)",

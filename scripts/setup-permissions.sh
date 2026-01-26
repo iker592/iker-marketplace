@@ -14,7 +14,7 @@ CLAUDE_DIR="$HOME/.claude"
 GLOBAL_SETTINGS="$CLAUDE_DIR/settings.json"
 GLOBAL_HOOKS_DIR="$CLAUDE_DIR/hooks"
 REPO_SETTINGS="$REPO_DIR/.claude/settings.json"
-REPO_HOOK="$REPO_DIR/.claude/hooks/block_commit_on_main.sh"
+REPO_HOOKS_DIR="$REPO_DIR/.claude/hooks"
 REPO_STATUSLINE="$REPO_DIR/.claude/statusline.sh"
 
 # Colors for output
@@ -57,12 +57,16 @@ if [ -f "$GLOBAL_SETTINGS" ]; then
     echo
 fi
 
-# Copy hook script
-if [ -f "$REPO_HOOK" ]; then
-    cp "$REPO_HOOK" "$GLOBAL_HOOKS_DIR/"
-    chmod +x "$GLOBAL_HOOKS_DIR/block_commit_on_main.sh"
-    echo -e "${GREEN}✓${NC} Installed hook script"
-    echo "  $GLOBAL_HOOKS_DIR/block_commit_on_main.sh"
+# Copy hook scripts
+if [ -d "$REPO_HOOKS_DIR" ]; then
+    for hook_file in "$REPO_HOOKS_DIR"/*.sh; do
+        if [ -f "$hook_file" ]; then
+            hook_name=$(basename "$hook_file")
+            cp "$hook_file" "$GLOBAL_HOOKS_DIR/"
+            chmod +x "$GLOBAL_HOOKS_DIR/$hook_name"
+            echo -e "${GREEN}✓${NC} Installed hook: $hook_name"
+        fi
+    done
     echo
 fi
 
@@ -85,6 +89,11 @@ HOOK_CONFIG='{
           "type": "command",
           "command": "~/.claude/hooks/block_commit_on_main.sh",
           "statusMessage": "Checking branch for commit"
+        },
+        {
+          "type": "command",
+          "command": "~/.claude/hooks/suggest_makefile.sh",
+          "statusMessage": "Checking for Makefile targets"
         }
       ]
     }
@@ -157,6 +166,7 @@ echo
 echo -e "${GREEN}Key protections enabled:${NC}"
 echo "  • Cannot push to main/master branches"
 echo "  • Cannot commit on main/master (hook)"
+echo "  • Cannot use uv/npm/pnpm/bun directly - use Makefile (hook)"
 echo "  • Cannot merge PRs via CLI"
 echo "  • Cannot force push"
 echo "  • Cannot run destructive commands (rm, reset, etc.)"

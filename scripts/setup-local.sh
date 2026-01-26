@@ -16,7 +16,7 @@ CLAUDE_DIR="$PROJECT_DIR/.claude"
 LOCAL_SETTINGS="$CLAUDE_DIR/settings.local.json"
 LOCAL_HOOKS_DIR="$CLAUDE_DIR/hooks"
 IKER_SETTINGS="$IKER_DIR/.claude/settings.json"
-IKER_HOOK="$IKER_DIR/.claude/hooks/block_commit_on_main.sh"
+IKER_HOOKS_DIR="$IKER_DIR/.claude/hooks"
 IKER_STATUSLINE="$IKER_DIR/.claude/statusline.sh"
 
 # Colors for output
@@ -83,12 +83,16 @@ else
     echo -e "${GREEN}✓${NC} Created .gitignore with local Claude Code files"
 fi
 
-# Copy hook script
-if [ -f "$IKER_HOOK" ]; then
-    cp "$IKER_HOOK" "$LOCAL_HOOKS_DIR/"
-    chmod +x "$LOCAL_HOOKS_DIR/block_commit_on_main.sh"
-    echo -e "${GREEN}✓${NC} Installed hook script"
-    echo "  $LOCAL_HOOKS_DIR/block_commit_on_main.sh"
+# Copy hook scripts
+if [ -d "$IKER_HOOKS_DIR" ]; then
+    for hook_file in "$IKER_HOOKS_DIR"/*.sh; do
+        if [ -f "$hook_file" ]; then
+            hook_name=$(basename "$hook_file")
+            cp "$hook_file" "$LOCAL_HOOKS_DIR/"
+            chmod +x "$LOCAL_HOOKS_DIR/$hook_name"
+            echo -e "${GREEN}✓${NC} Installed hook: $hook_name"
+        fi
+    done
 fi
 
 # Copy statusline script
@@ -124,6 +128,11 @@ HOOK_CONFIG='{
           "type": "command",
           "command": ".claude/hooks/block_commit_on_main.sh",
           "statusMessage": "Checking branch for commit"
+        },
+        {
+          "type": "command",
+          "command": ".claude/hooks/suggest_makefile.sh",
+          "statusMessage": "Checking for Makefile targets"
         }
       ]
     }
@@ -181,6 +190,7 @@ echo "  Deny list:  $(echo "$FINAL" | jq '.permissions.deny | length') rules"
 echo
 echo -e "${GREEN}Key protections enabled:${NC}"
 echo "  • Cannot commit on main/master branches (hook)"
+echo "  • Cannot use uv/npm/pnpm/bun directly - use Makefile (hook)"
 echo "  • Cannot push to main/master branches"
 echo "  • Cannot merge PRs via CLI"
 echo "  • Cannot force push"
