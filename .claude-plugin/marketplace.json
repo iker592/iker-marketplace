@@ -26,6 +26,11 @@
       "name": "apple-notes",
       "source": "./plugins/apple-notes",
       "description": "Read, create, and manage Apple Notes on macOS via AppleScript"
+    },
+    {
+      "name": "typescript-dev",
+      "source": "./plugins/typescript-dev",
+      "description": "TypeScript/React development: Bun, Vite, React, Tailwind, shadcn/ui, Zustand, Vitest, Playwright, Biome"
     }
   ]
 }
