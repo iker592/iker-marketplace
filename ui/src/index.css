@@ -15,9 +15,9 @@ body,
 }
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background-color: #2D2B2B;
-  color: #E5E5E5;
+  font-family: "Inter", system-ui, sans-serif;
+  background-color: #2d2b2b;
+  color: #e5e5e5;
 }
 
 /* Custom scrollbar */
@@ -30,23 +30,23 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #4B4949;
+  background: #4b4949;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #5B5959;
+  background: #5b5959;
 }
 
 /* Code blocks */
 pre {
-  background-color: #1A1919;
+  background-color: #1a1919;
   border-radius: 8px;
   padding: 16px;
   overflow-x: auto;
 }
 
 code {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 14px;
 }

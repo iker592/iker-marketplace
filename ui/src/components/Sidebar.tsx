@@ -1,6 +1,6 @@
-import { MessageSquarePlus, MessagesSquare } from 'lucide-react'
-import { useChatStore, type Conversation } from '@/stores/useChatStore'
 import { cn } from '@/lib/utils'
+import { type Conversation, useChatStore } from '@/stores/useChatStore'
+import { MessageSquarePlus, MessagesSquare } from 'lucide-react'
 
 export function Sidebar() {
   const { conversations, activeConversationId, createConversation, setActiveConversation } =
@@ -68,7 +68,7 @@ function ConversationItem({
         'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors',
         isActive
           ? 'bg-claude-bg-light text-claude-text'
-          : 'text-claude-text-muted hover:bg-claude-bg-light hover:text-claude-text'
+          : 'text-claude-text-muted hover:bg-claude-bg-light hover:text-claude-text',
       )}
     >
       <MessagesSquare size={16} />

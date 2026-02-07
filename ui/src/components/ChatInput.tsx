@@ -1,6 +1,6 @@
-import { useState, type KeyboardEvent } from 'react'
-import { Send } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Send } from 'lucide-react'
+import { type KeyboardEvent, useState } from 'react'
 
 interface ChatInputProps {
   onSend: (message: string) => void
@@ -37,7 +37,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
             rows={1}
             className={cn(
               'max-h-40 min-h-[44px] flex-1 resize-none bg-transparent px-3 py-2 text-claude-text placeholder-claude-text-muted outline-none',
-              disabled && 'cursor-not-allowed opacity-50'
+              disabled && 'cursor-not-allowed opacity-50',
             )}
             style={{
               height: 'auto',
@@ -51,7 +51,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
               'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors',
               input.trim() && !disabled
                 ? 'bg-claude-accent text-white hover:bg-claude-accent-hover'
-                : 'bg-claude-border text-claude-text-muted'
+                : 'bg-claude-border text-claude-text-muted',
             )}
           >
             <Send size={18} />
