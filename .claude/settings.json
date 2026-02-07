@@ -156,7 +156,6 @@
       "Bash(mv:*)",
       "Bash(chown:*)",
       "Bash(sudo:*)",
-      "Bash(wget:*)",
       "Bash(gh pr merge:*)",
       "Bash(gh pr merge)"
     ]
