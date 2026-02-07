@@ -45,6 +45,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
             }}
           />
           <button
+            type="button"
             onClick={handleSend}
             disabled={!input.trim() || disabled}
             className={cn(

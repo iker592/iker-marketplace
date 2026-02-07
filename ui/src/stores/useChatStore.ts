@@ -152,7 +152,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       if (!response.ok) {
         let message = 'API request failed'
         try {
-          const body = await response.json() as { error?: string }
+          const body = (await response.json()) as { error?: string }
           if (body?.error) message = body.error
         } catch {
           // use default message
@@ -180,7 +180,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
             try {
               const parsed = JSON.parse(data)
               if (parsed.text) {
-                get().appendToMessage(convId!, assistantMessageId, parsed.text)
+                if (convId) get().appendToMessage(convId, assistantMessageId, parsed.text)
               }
             } catch {
               // Ignore parse errors for incomplete chunks
@@ -191,7 +191,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
     } catch (error) {
       console.error('Error sending message:', error)
       const message =
-        error instanceof Error ? error.message : 'Sorry, I encountered an error. Please make sure the server is running on port 3001.'
+        error instanceof Error
+          ? error.message
+          : 'Sorry, I encountered an error. Please make sure the server is running on port 3001.'
       get().updateMessage(convId, assistantMessageId, message)
     } finally {
       set({ isLoading: false })

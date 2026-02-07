@@ -11,6 +11,7 @@ export function Sidebar() {
       {/* New chat button */}
       <div className="p-3">
         <button
+          type="button"
           onClick={createConversation}
           className="flex w-full items-center gap-2 rounded-lg border border-claude-border px-4 py-3 text-sm font-medium text-claude-text transition-colors hover:bg-claude-bg-light"
         >
@@ -63,6 +64,7 @@ function ConversationItem({
 }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       className={cn(
         'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors',

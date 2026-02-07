@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.node.json",
+  "compilerOptions": {
+    "composite": false,
+    "skipLibCheck": false,
+    "noImplicitAny": false,
+    "moduleResolution": "bundler",
+    "types": ["bun"],
+    "resolvePackageJsonExports": true,
+    "resolvePackageJsonImports": true
+  },
+  "include": ["./**/*"]
+}

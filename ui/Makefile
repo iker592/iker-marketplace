@@ -1,4 +1,4 @@
-.PHONY: setup ui server server-bedrock build test fix lint preview clean all
+.PHONY: setup deps ui server server-bedrock dev build test fix lint preview clean all
 
 setup:
 	curl -fsSL https://bun.sh/install | bash
@@ -15,6 +15,9 @@ server:
 
 server-bedrock:
 	CLAUDE_CODE_USE_BEDROCK=1 bun run server
+
+dev:
+	bun run dev:all
 
 build:
 	bun run build
@@ -34,4 +37,4 @@ preview:
 clean:
 	rm -rf node_modules dist
 
-all: fix test build
+all: fix build

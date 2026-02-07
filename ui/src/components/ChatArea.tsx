@@ -10,9 +10,12 @@ export function ChatArea() {
 
   const conversation = getActiveConversation()
 
+  const messageCount = conversation?.messages.length ?? 0
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [conversation?.messages])
+    if (messageCount > 0) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [messageCount])
 
   const handleSend = async (content: string) => {
     await sendMessage(content)

@@ -11,9 +11,7 @@
  *
  * See: https://platform.claude.com/docs/en/agent-sdk/overview
  */
-
 import { query } from '@anthropic-ai/claude-agent-sdk'
-
 const SYSTEM_PROMPT = `You are a helpful assistant for the Iker Marketplace, a collection of plugins for Claude Code.
 
 Here are the available plugins in the marketplace:
@@ -42,42 +40,31 @@ To install plugins, users can run:
 - \`iker setup-global\` - Setup globally for all projects
 
 Be helpful and concise. Answer questions about the plugins, their features, and how to use them.`
-
 // Enable Bedrock if env var is set
 // The Agent SDK automatically detects CLAUDE_CODE_USE_BEDROCK=1 from environment
 const USE_BEDROCK = Bun.env.CLAUDE_CODE_USE_BEDROCK === '1'
-
 if (USE_BEDROCK) {
   console.log('✓ Bedrock mode enabled (CLAUDE_CODE_USE_BEDROCK=1)')
 } else {
   console.log('ℹ Using Anthropic API (set CLAUDE_CODE_USE_BEDROCK=1 to use Bedrock)')
 }
-
-interface Message {
-  role: 'user' | 'assistant'
-  content: string
-}
-
 const server = Bun.serve({
   port: 3001,
-  async fetch(req: Request) {
+  async fetch(req) {
     const url = new URL(req.url)
-
     // CORS headers
     const corsHeaders = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
     }
-
     // Handle preflight
     if (req.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders })
     }
-
     if (url.pathname === '/api/chat' && req.method === 'POST') {
       try {
-        let body: { messages?: Message[] } | undefined
+        let body
         try {
           body = await req.json()
         } catch (parseError) {
@@ -89,8 +76,7 @@ const server = Bun.serve({
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           })
         }
-        const messages: Message[] = body?.messages || []
-
+        const messages = body?.messages || []
         // Build prompt from conversation history
         // Last message is the user's current question
         const lastMessage = messages[messages.length - 1]
@@ -100,7 +86,6 @@ const server = Bun.serve({
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           })
         }
-
         // Build context from previous messages
         const contextMessages = messages.slice(0, -1)
         let prompt = lastMessage.content
@@ -110,7 +95,6 @@ const server = Bun.serve({
             .join('\n\n')
           prompt = `${context}\n\nUser: ${lastMessage.content}`
         }
-
         // Create streaming response using Agent SDK
         const encoder = new TextEncoder()
         const readable = new ReadableStream({
@@ -129,7 +113,6 @@ const server = Bun.serve({
                     }),
                 },
               })
-
               for await (const message of agentQuery) {
                 if (
                   message.type === 'stream_event' &&
@@ -154,7 +137,7 @@ const server = Bun.serve({
               controller.close()
             } catch (error) {
               console.error('Stream error:', error)
-              const err = error as { message?: string }
+              const err = error
               const raw = err?.message ?? ''
               const msg = raw || 'An error occurred while generating the response.'
               controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: msg })}\n\n`))
@@ -163,7 +146,6 @@ const server = Bun.serve({
             }
           },
         })
-
         return new Response(readable, {
           headers: {
             ...corsHeaders,
@@ -172,9 +154,9 @@ const server = Bun.serve({
             Connection: 'keep-alive',
           },
         })
-      } catch (error: unknown) {
+      } catch (error) {
         console.error('API error:', error)
-        const err = error as { status?: number; message?: string; error?: { message?: string } }
+        const err = error
         const status = err?.status ?? 500
         const rawMessage = String(err?.message ?? '')
         const userMessage = rawMessage || 'Internal server error'
@@ -184,9 +166,7 @@ const server = Bun.serve({
         })
       }
     }
-
     return new Response('Not found', { status: 404, headers: corsHeaders })
   },
 })
-
 console.log(`Server running at http://localhost:${server.port}`)
