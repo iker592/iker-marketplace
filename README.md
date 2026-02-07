@@ -110,6 +110,9 @@ This marketplace also includes productivity plugins for Claude Code.
 
 | Plugin | Description | Install |
 |--------|-------------|---------|
+| **typescript-dev** | TypeScript/React development standards (Bun, Vite, React, Tailwind, shadcn/ui, Vitest, Biome) | `/plugin install typescript-dev@iker-marketplace` |
+| **python-dev** | Python development standards (uv, FastAPI, FastMCP, pytest, ruff) | `/plugin install python-dev@iker-marketplace` |
+| **apple-notes** | Apple Notes integration via AppleScript on macOS | `/plugin install apple-notes@iker-marketplace` |
 | **second-brain** | Capture, organize, and retrieve knowledge | `/plugin install second-brain@iker-marketplace` |
 | **daily-todos** | Manage daily tasks and to-do lists | `/plugin install daily-todos@iker-marketplace` |
 
@@ -131,10 +134,43 @@ After installation, use the slash commands:
 
 ---
 
+## Chat UI
+
+A web-based chat interface for exploring plugins, powered by the Claude Agent SDK and Amazon Bedrock.
+
+### Running
+
+```bash
+cd ui
+make setup              # Install dependencies (first time)
+make ui                 # Start frontend (http://localhost:3000)
+make server-bedrock     # Start chat server with Bedrock (http://localhost:3001)
+```
+
+Or start both at once:
+
+```bash
+cd ui
+bun run dev:all         # Starts UI + server concurrently
+```
+
+### Bedrock Configuration
+
+The chat server uses the [Claude Agent SDK](https://platform.claude.com/docs/en/agent-sdk/overview) with Amazon Bedrock:
+
+1. Set `CLAUDE_CODE_USE_BEDROCK=1` (done automatically by `make server-bedrock`)
+2. Configure AWS credentials (`aws configure` or environment variables)
+3. Ensure Claude models are enabled in your Bedrock region
+
+To use the Anthropic API instead, run `make server` (requires `ANTHROPIC_API_KEY`).
+
+---
+
 ## Requirements
 
 - **jq** - Required for setup commands (`brew install jq` on macOS)
 - **git** - Required for installation
+- **Bun** - Required for the chat UI (`curl -fsSL https://bun.sh/install | bash`)
 
 ---
 
@@ -171,16 +207,25 @@ iker-marketplace/
 │   ├── setup-permissions.sh    # Global permissions setup
 │   └── setup-local.sh          # Local project setup
 ├── .claude/
-│   ├── settings.json           # Default permissions
-│   ├── statusline.sh           # Status line script
-│   └── hooks/
-│       └── block_commit_on_main.sh
+│   └── settings.json           # Default permissions
+├── .claude-plugin/
+│   └── marketplace.json        # Plugin marketplace manifest
 ├── .github/
 │   └── workflows/
 │       └── release.yml         # Auto-versioning action
 ├── plugins/
-│   ├── second-brain/
-│   └── daily-todos/
+│   ├── typescript-dev/         # TypeScript/React dev standards
+│   ├── python-dev/             # Python dev standards
+│   ├── apple-notes/            # Apple Notes integration
+│   ├── second-brain/           # Knowledge management
+│   └── daily-todos/            # Task management
+├── ui/                         # Chat UI (React + Bun)
+│   ├── server/                 # Chat API server (Claude Agent SDK)
+│   ├── src/                    # React frontend
+│   ├── Makefile
+│   └── package.json
+├── CLAUDE.md
+├── SETUP.md
 └── README.md
 ```
 

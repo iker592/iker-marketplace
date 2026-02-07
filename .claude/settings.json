@@ -3,18 +3,7 @@
     "PreToolUse": [
       {
         "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/block_commit_on_main.sh",
-            "statusMessage": "Checking branch for commit"
-          },
-          {
-            "type": "command",
-            "command": ".claude/hooks/suggest_makefile.sh",
-            "statusMessage": "Checking for Makefile targets"
-          }
-        ]
+        "hooks": []
       }
     ]
   },
